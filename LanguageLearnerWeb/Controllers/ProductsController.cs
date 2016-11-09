@@ -8,6 +8,7 @@ using System.Web.Http;
 
 namespace LanguageLearnerWeb.Controllers
 {
+    [Authorize]
     public class ProductsController : ApiController
     {
         private Product[] products = new Product[]
