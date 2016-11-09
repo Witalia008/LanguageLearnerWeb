@@ -17,6 +17,8 @@ namespace LanguageLearnerWeb
             config.SuppressDefaultHostAuthentication();
             config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
 
+            config.Filters.Add(new LanguageLearnerWeb.Filters.RequireHttpsAttribute());
+
             // Web API routes
             config.MapHttpAttributeRoutes();
 
