@@ -16,6 +16,8 @@ namespace LanguageLearnerWeb.Models
             // Add custom user claims here
             return userIdentity;
         }
+
+        public virtual Profile Profile { get; set; }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
@@ -29,5 +31,7 @@ namespace LanguageLearnerWeb.Models
         {
             return new ApplicationDbContext();
         }
+
+        public System.Data.Entity.DbSet<LanguageLearnerWeb.Models.Profile> Profiles { get; set; }
     }
 }
