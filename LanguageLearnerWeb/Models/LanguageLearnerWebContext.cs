@@ -18,9 +18,5 @@ namespace LanguageLearnerWeb.Models
         public LanguageLearnerWebContext() : base("name=LanguageLearnerWebContext")
         {
         }
-
-        public System.Data.Entity.DbSet<LanguageLearnerWeb.Models.dull.Author> Authors { get; set; }
-
-        public System.Data.Entity.DbSet<LanguageLearnerWeb.Models.dull.Book> Books { get; set; }
     }
 }
