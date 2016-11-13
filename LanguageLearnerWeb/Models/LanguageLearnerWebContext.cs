@@ -18,5 +18,7 @@ namespace LanguageLearnerWeb.Models
         public LanguageLearnerWebContext() : base("name=LanguageLearnerWebContext")
         {
         }
+
+        public System.Data.Entity.DbSet<LanguageLearnerWeb.Models.Level> Levels { get; set; }
     }
 }
