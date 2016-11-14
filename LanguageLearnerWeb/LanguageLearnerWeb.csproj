@@ -261,6 +261,10 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LevelsController.cs" />
     <Compile Include="Controllers\ProfilesController.cs" />
+    <Compile Include="Controllers\SearchController.cs" />
+    <Compile Include="Extensions\Search\Bing.cs" />
+    <Compile Include="Extensions\Search\SearchEngine.cs" />
+    <Compile Include="Extensions\Search\Yandex.cs" />
     <Compile Include="Filters\RequireHttpsAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
