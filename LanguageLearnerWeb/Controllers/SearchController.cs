@@ -14,6 +14,9 @@ namespace LanguageLearnerWeb.Controllers
     [RoutePrefix("api/Search")]
     public class SearchController : ApiController
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         // GET: api/Search/Images?count={count}&text={text}
         [ResponseType(typeof(List<string>))]
         [Route("Images")]
@@ -26,12 +29,13 @@ namespace LanguageLearnerWeb.Controllers
             }
             return Ok(res);
         }
-
+        
         // GET: api/Search/Image?text={text}
         [ResponseType(typeof(string))]
         [Route("Image")]
         public async Task<IHttpActionResult> GetImage(string text)
         {
+            logger.Info("Requesting image");
             var res = await SearchEngine.BingInstance.ImageSingleAsync(text);
             if (res == null || res == "")
             {
