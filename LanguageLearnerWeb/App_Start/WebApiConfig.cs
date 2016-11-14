@@ -27,6 +27,12 @@ namespace LanguageLearnerWeb
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
+            var traceWriter = config.EnableSystemDiagnosticsTracing();
+            traceWriter.IsVerbose = true;
+            traceWriter.MinimumLevel = System.Web.Http.Tracing.TraceLevel.Debug;
+
+            log4net.Config.XmlConfigurator.Configure();
         }
     }
 }
