@@ -285,6 +285,10 @@
     <Compile Include="Migrations\AppContext\201611131446513_AddProfiles.Designer.cs">
       <DependentUpon>201611131446513_AddProfiles.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\AppContext\201611251158411_AddLevels.cs" />
+    <Compile Include="Migrations\AppContext\201611251158411_AddLevels.Designer.cs">
+      <DependentUpon>201611251158411_AddLevels.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\AppContext\Configuration.cs" />
     <Compile Include="Models\Personal\Profile.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -391,6 +395,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\AppContext\201611131446513_AddProfiles.resx">
       <DependentUpon>201611131446513_AddProfiles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\AppContext\201611251158411_AddLevels.resx">
+      <DependentUpon>201611251158411_AddLevels.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
