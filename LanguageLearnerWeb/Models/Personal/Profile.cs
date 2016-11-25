@@ -19,9 +19,9 @@ namespace LanguageLearnerWeb.Models
         public string Surname { get; set; }
         public string UserImage { get; set; }
 
-        //[ForeignKey("Language")]
-        //[Required]
-        //public int LanguageOfInterfaceId;
-        //public virtual Language Language { get; set; }
+        [ForeignKey("InterfaceLanguage")]
+        [Required]
+        public int InterfaceLanguageId;
+        public virtual Language InterfaceLanguage { get; set; }
     }
 }
