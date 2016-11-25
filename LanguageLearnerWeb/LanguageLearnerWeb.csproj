@@ -267,6 +267,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LanguagesController.cs" />
     <Compile Include="Controllers\LevelsController.cs" />
     <Compile Include="Controllers\ProfilesController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
@@ -289,12 +290,17 @@
     <Compile Include="Migrations\AppContext\201611251158411_AddLevels.Designer.cs">
       <DependentUpon>201611251158411_AddLevels.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\AppContext\201611251223087_AddLanguages.cs" />
+    <Compile Include="Migrations\AppContext\201611251223087_AddLanguages.Designer.cs">
+      <DependentUpon>201611251223087_AddLanguages.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\AppContext\Configuration.cs" />
     <Compile Include="Models\Personal\Profile.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Personal\ProfileDTO.cs" />
+    <Compile Include="Models\Public\Language.cs" />
     <Compile Include="Models\Public\Level.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
@@ -398,6 +404,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\AppContext\201611251158411_AddLevels.resx">
       <DependentUpon>201611251158411_AddLevels.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\AppContext\201611251223087_AddLanguages.resx">
+      <DependentUpon>201611251223087_AddLanguages.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
