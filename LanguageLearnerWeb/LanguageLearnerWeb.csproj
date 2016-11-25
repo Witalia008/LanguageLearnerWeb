@@ -299,6 +299,10 @@
     <Compile Include="Migrations\AppContext\201611251523463_AddProfileLanguages.Designer.cs">
       <DependentUpon>201611251523463_AddProfileLanguages.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\AppContext\201611251539217_AddUserInterfaceLanguage.cs" />
+    <Compile Include="Migrations\AppContext\201611251539217_AddUserInterfaceLanguage.Designer.cs">
+      <DependentUpon>201611251539217_AddUserInterfaceLanguage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\AppContext\Configuration.cs" />
     <Compile Include="Models\Personal\Profile.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -416,6 +420,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\AppContext\201611251523463_AddProfileLanguages.resx">
       <DependentUpon>201611251523463_AddProfileLanguages.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\AppContext\201611251539217_AddUserInterfaceLanguage.resx">
+      <DependentUpon>201611251539217_AddUserInterfaceLanguage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
