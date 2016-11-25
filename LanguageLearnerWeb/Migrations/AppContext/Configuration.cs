@@ -33,12 +33,30 @@ namespace LanguageLearnerWeb.Migrations.AppContext
             return path;
         }
 
-        protected override void Seed(LanguageLearnerWeb.Models.ApplicationDbContext context)
+        private void SeedLevels(ApplicationDbContext context)
         {
             var levelsContents = System.IO.File.ReadAllText(MapPath(@"~/App_Data/Levels.json"));
             var levels = JsonConvert.DeserializeObject<List<Level>>(levelsContents).ToArray();
             context.Levels.AddOrUpdate(
                 l => l.PointsRequired, levels);
+        }
+
+        private void SeedLanguages(ApplicationDbContext context)
+        {
+            context.Languages.AddOrUpdate(
+                p => p.Id,
+                new Language { Id = 1, Name = "English", NameOriginal = "English",
+                    ShortName = "EN", ShortNameCC = "EN-US" },
+                new Language { Id = 2, Name = "English", NameOriginal = "English",
+                    ShortName = "EN", ShortNameCC = "EN-GB" },
+                new Language { Id = 3, Name = "Ukrainian", NameOriginal = "Українська",
+                    ShortName = "UK", ShortNameCC = "UK-UA"});
+        }
+
+        protected override void Seed(LanguageLearnerWeb.Models.ApplicationDbContext context)
+        {
+            SeedLevels(context);
+            SeedLanguages(context);
 
             //  This method will be called after migrating to the latest version.
 
