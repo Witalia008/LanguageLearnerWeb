@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
+using System.Data.Entity;
 
 namespace LanguageLearnerWeb.Models
 {
@@ -32,6 +33,7 @@ namespace LanguageLearnerWeb.Models
             return new ApplicationDbContext();
         }
 
-        public System.Data.Entity.DbSet<LanguageLearnerWeb.Models.Profile> Profiles { get; set; }
+        public DbSet<Profile> Profiles { get; set; }
+        public DbSet<Level> Levels { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-namespace LanguageLearnerWeb.Migrations.LLContext
+namespace LanguageLearnerWeb.Migrations.AppContext
 {
     using System;
     using System.Data.Entity.Migrations;
