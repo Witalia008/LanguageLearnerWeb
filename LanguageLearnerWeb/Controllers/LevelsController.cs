@@ -16,7 +16,7 @@ namespace LanguageLearnerWeb.Controllers
     [Authorize]
     public class LevelsController : ApiController
     {
-        private LanguageLearnerWebContext db = new LanguageLearnerWebContext();
+        private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: api/Levels
         public IQueryable<Level> GetLevels()

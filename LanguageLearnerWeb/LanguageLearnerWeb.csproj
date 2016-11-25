@@ -286,16 +286,10 @@
       <DependentUpon>201611131446513_AddProfiles.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\AppContext\Configuration.cs" />
-    <Compile Include="Migrations\LLContext\201611131556381_AddLevels.cs" />
-    <Compile Include="Migrations\LLContext\201611131556381_AddLevels.Designer.cs">
-      <DependentUpon>201611131556381_AddLevels.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\LLContext\Configuration.cs" />
     <Compile Include="Models\Personal\Profile.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
-    <Compile Include="Models\LanguageLearnerWebContext.cs" />
     <Compile Include="Models\Personal\ProfileDTO.cs" />
     <Compile Include="Models\Public\Level.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -397,9 +391,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\AppContext\201611131446513_AddProfiles.resx">
       <DependentUpon>201611131446513_AddProfiles.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\LLContext\201611131556381_AddLevels.resx">
-      <DependentUpon>201611131556381_AddLevels.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
