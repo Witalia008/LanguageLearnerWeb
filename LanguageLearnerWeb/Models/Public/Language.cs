@@ -17,6 +17,7 @@ namespace LanguageLearnerWeb.Models
         [Required]
         public string Name { get; set; }
         public string NameOriginal { get; set; }
+
         [Required]
         public string ShortName { get; set; }
         [RegularExpression(@"^[A-Z]{2}-[A-Z]{2}$")]

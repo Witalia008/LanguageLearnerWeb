@@ -269,6 +269,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LanguagesController.cs" />
     <Compile Include="Controllers\LevelsController.cs" />
+    <Compile Include="Controllers\ProfileLanguagesController.cs" />
     <Compile Include="Controllers\ProfilesController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Extensions\Search\Bing.cs" />
@@ -294,12 +295,17 @@
     <Compile Include="Migrations\AppContext\201611251223087_AddLanguages.Designer.cs">
       <DependentUpon>201611251223087_AddLanguages.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\AppContext\201611251523463_AddProfileLanguages.cs" />
+    <Compile Include="Migrations\AppContext\201611251523463_AddProfileLanguages.Designer.cs">
+      <DependentUpon>201611251523463_AddProfileLanguages.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\AppContext\Configuration.cs" />
     <Compile Include="Models\Personal\Profile.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Personal\ProfileDTO.cs" />
+    <Compile Include="Models\Personal\ProfileLanguage.cs" />
     <Compile Include="Models\Public\Language.cs" />
     <Compile Include="Models\Public\Level.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -407,6 +413,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\AppContext\201611251223087_AddLanguages.resx">
       <DependentUpon>201611251223087_AddLanguages.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\AppContext\201611251523463_AddProfileLanguages.resx">
+      <DependentUpon>201611251523463_AddProfileLanguages.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
