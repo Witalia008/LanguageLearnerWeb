@@ -273,6 +273,7 @@
     <Compile Include="Controllers\PrepositionsController.cs" />
     <Compile Include="Controllers\ProfileLanguagesController.cs" />
     <Compile Include="Controllers\ProfileMaterialsController.cs" />
+    <Compile Include="Controllers\ProfilePrepositionsController.cs" />
     <Compile Include="Controllers\ProfilesController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
@@ -323,6 +324,10 @@
     <Compile Include="Migrations\AppContext\201611261239341_AddPrepositions.Designer.cs">
       <DependentUpon>201611261239341_AddPrepositions.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\AppContext\201611261248508_AddProfilePrepositions.cs" />
+    <Compile Include="Migrations\AppContext\201611261248508_AddProfilePrepositions.Designer.cs">
+      <DependentUpon>201611261248508_AddProfilePrepositions.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\AppContext\Configuration.cs" />
     <Compile Include="Models\Personal\Profile.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -331,6 +336,7 @@
     <Compile Include="Models\Personal\ProfileDTO.cs" />
     <Compile Include="Models\Personal\ProfileLanguage.cs" />
     <Compile Include="Models\Personal\ProfileMaterial.cs" />
+    <Compile Include="Models\Personal\ProfilePreposition.cs" />
     <Compile Include="Models\Personal\Settings.cs" />
     <Compile Include="Models\Public\Language.cs" />
     <Compile Include="Models\Public\Level.cs" />
@@ -459,6 +465,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\AppContext\201611261239341_AddPrepositions.resx">
       <DependentUpon>201611261239341_AddPrepositions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\AppContext\201611261248508_AddProfilePrepositions.resx">
+      <DependentUpon>201611261248508_AddProfilePrepositions.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
