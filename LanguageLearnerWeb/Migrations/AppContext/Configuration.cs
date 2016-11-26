@@ -62,6 +62,14 @@ namespace LanguageLearnerWeb.Migrations.AppContext
                 new Material { Id = 2, Difficulty = 1, Headline = "Ïðèâ³ò", Text = "Ñâ³ò", LanguageId = 3 });
         }
 
+        private void SeedPrepositions(ApplicationDbContext context)
+        {
+            context.Prepositions.AddOrUpdate(
+                p => p.Id,
+                new Preposition { Id = 1, LanguageId = 1, Prefix = "a", Suffix = "b", Options = "c", Answer = "d" },
+                new Preposition { Id = 2, LanguageId = 2, Prefix = "q", Suffix = "w", Options = "e", Answer = "r" });
+        }
+
         private void SeedProfiles(ApplicationDbContext context)
         {
             var passwordHash = new PasswordHasher();
@@ -117,6 +125,7 @@ namespace LanguageLearnerWeb.Migrations.AppContext
             SeedLevels(context);
             SeedLanguages(context);
             SeedMaterials(context);
+            SeedPrepositions(context);
 
             SeedProfiles(context);
             SeedProfileLanguages(context);
