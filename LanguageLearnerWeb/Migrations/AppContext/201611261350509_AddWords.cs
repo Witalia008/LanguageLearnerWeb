@@ -21,7 +21,7 @@ namespace LanguageLearnerWeb.Migrations.AppContext
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Languages", t => t.LanguageFromId, cascadeDelete: true)
-                .ForeignKey("dbo.Languages", t => t.LanguageToId, cascadeDelete: true)
+                .ForeignKey("dbo.Languages", t => t.LanguageToId/*, cascadeDelete: true*/)
                 .Index(t => t.LanguageFromId)
                 .Index(t => t.LanguageToId);
             
