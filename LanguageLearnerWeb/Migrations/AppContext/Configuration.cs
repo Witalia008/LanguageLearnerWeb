@@ -1,5 +1,6 @@
 namespace LanguageLearnerWeb.Migrations.AppContext
 {
+    using Microsoft.AspNet.Identity;
     using Models;
     using Newtonsoft.Json;
     using System;
@@ -58,7 +59,47 @@ namespace LanguageLearnerWeb.Migrations.AppContext
             context.Materials.AddOrUpdate(
                 p => p.Id,
                 new Material { Id = 1, Difficulty = 1, Headline = "Hello", Text = "World", LanguageId = 1 },
-                new Material { Id = 1, Difficulty = 1, Headline = "Ïðèâ³ò", Text = "Ñâ³ò", LanguageId = 3 });
+                new Material { Id = 2, Difficulty = 1, Headline = "Ïðèâ³ò", Text = "Ñâ³ò", LanguageId = 3 });
+        }
+
+        private void SeedProfiles(ApplicationDbContext context)
+        {
+            var passwordHash = new PasswordHasher();
+            string password = passwordHash.HashPassword("password123");
+            string userName = "hello1@gmail.com";
+            context.Users.AddOrUpdate(
+                u => u.UserName,
+                new ApplicationUser { Id = userName, UserName = userName, PasswordHash = password });
+
+            context.Profiles.AddOrUpdate(
+                p => p.UserName,
+                new Profile { UserId = userName, UserName = userName, InterfaceLanguageId = 1 });
+
+            password = passwordHash.HashPassword("password123");
+            userName = "hello2@gmail.com";
+            context.Users.AddOrUpdate(
+                u => u.UserName,
+                new ApplicationUser {Id = userName, UserName = userName, PasswordHash = password });
+
+            context.Profiles.AddOrUpdate(
+                p => p.UserName,
+                new Profile { UserId = userName, UserName = userName, InterfaceLanguageId = 1 });
+        }
+
+        private void SeedProfileLanguages(ApplicationDbContext context)
+        {
+            context.ProfileLanguages.AddOrUpdate(
+                p => p.Id,
+                new ProfileLanguage { Id = 1, LanguageId = 1, ProfileId = "hello1@gmail.com", LevelId = 10 },
+                new ProfileLanguage { Id = 2, LanguageId = 3, ProfileId = "hello1@gmail.com", LevelId = 10 });
+        }
+
+        private void SeedProfileMaterials(ApplicationDbContext context)
+        {
+            context.ProfileMaterials.AddOrUpdate(
+                m => m.Id,
+                new ProfileMaterial { Id = 1, MaterialId = 1, ProfileId = "hello1@gmail.com" },
+                new ProfileMaterial { Id = 2, MaterialId = 2, ProfileId = "hello2@gmail.com" });
         }
 
         protected override void Seed(LanguageLearnerWeb.Models.ApplicationDbContext context)
@@ -66,6 +107,10 @@ namespace LanguageLearnerWeb.Migrations.AppContext
             SeedLevels(context);
             SeedLanguages(context);
             SeedMaterials(context);
+
+            SeedProfiles(context);
+            SeedProfileLanguages(context);
+            SeedProfileMaterials(context);
 
             //  This method will be called after migrating to the latest version.
 

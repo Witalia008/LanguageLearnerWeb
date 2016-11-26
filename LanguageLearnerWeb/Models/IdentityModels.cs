@@ -38,5 +38,6 @@ namespace LanguageLearnerWeb.Models
         public DbSet<Language> Languages { get; set; }
         public DbSet<ProfileLanguage> ProfileLanguages { get; set; }
         public DbSet<Material> Materials { get; set; }
+        public DbSet<ProfileMaterial> ProfileMaterials { get; set; }
     }
 }
