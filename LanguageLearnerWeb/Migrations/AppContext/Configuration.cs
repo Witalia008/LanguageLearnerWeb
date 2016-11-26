@@ -53,10 +53,19 @@ namespace LanguageLearnerWeb.Migrations.AppContext
                     ShortName = "UK", ShortNameCC = "UK-UA"});
         }
 
+        private void SeedMaterials(ApplicationDbContext context)
+        {
+            context.Materials.AddOrUpdate(
+                p => p.Id,
+                new Material { Id = 1, Difficulty = 1, Headline = "Hello", Text = "World", LanguageId = 1 },
+                new Material { Id = 1, Difficulty = 1, Headline = "Ïðèâ³ò", Text = "Ñâ³ò", LanguageId = 3 });
+        }
+
         protected override void Seed(LanguageLearnerWeb.Models.ApplicationDbContext context)
         {
             SeedLevels(context);
             SeedLanguages(context);
+            SeedMaterials(context);
 
             //  This method will be called after migrating to the latest version.
 
