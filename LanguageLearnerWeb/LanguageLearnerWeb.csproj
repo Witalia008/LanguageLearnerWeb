@@ -277,6 +277,7 @@
     <Compile Include="Controllers\ProfilesController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
+    <Compile Include="Controllers\WordsController.cs" />
     <Compile Include="Extensions\Search\Bing.cs" />
     <Compile Include="Extensions\Search\SearchEngine.cs" />
     <Compile Include="Extensions\Search\Yandex.cs" />
@@ -328,6 +329,10 @@
     <Compile Include="Migrations\AppContext\201611261248508_AddProfilePrepositions.Designer.cs">
       <DependentUpon>201611261248508_AddProfilePrepositions.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\AppContext\201611261350509_AddWords.cs" />
+    <Compile Include="Migrations\AppContext\201611261350509_AddWords.Designer.cs">
+      <DependentUpon>201611261350509_AddWords.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\AppContext\Configuration.cs" />
     <Compile Include="Models\Personal\Profile.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -342,6 +347,7 @@
     <Compile Include="Models\Public\Level.cs" />
     <Compile Include="Models\Public\Material.cs" />
     <Compile Include="Models\Public\Preposition.cs" />
+    <Compile Include="Models\Public\Word.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Results\ChallengeResult.cs" />
@@ -468,6 +474,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\AppContext\201611261248508_AddProfilePrepositions.resx">
       <DependentUpon>201611261248508_AddProfilePrepositions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\AppContext\201611261350509_AddWords.resx">
+      <DependentUpon>201611261350509_AddWords.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

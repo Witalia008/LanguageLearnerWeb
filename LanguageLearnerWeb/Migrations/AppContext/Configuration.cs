@@ -70,6 +70,15 @@ namespace LanguageLearnerWeb.Migrations.AppContext
                 new Preposition { Id = 2, LanguageId = 2, Prefix = "q", Suffix = "w", Options = "e", Answer = "r" });
         }
 
+        private void SeedWords(ApplicationDbContext context)
+        {
+            context.Words.AddOrUpdate(
+                w => w.Id,
+                new Word { Id = 1, Name = "a", Translation = "b", LanguageFromId = 1, LanguageToId = 2 },
+                new Word { Id = 2, Name = "s", Translation = "d", LanguageFromId = 2, LanguageToId = 3 },
+                new Word { Id = 3, Name = "q", Translation = "w", LanguageFromId = 3, LanguageToId = 1 });
+        }
+
         private void SeedProfiles(ApplicationDbContext context)
         {
             var passwordHash = new PasswordHasher();
