@@ -43,5 +43,6 @@ namespace LanguageLearnerWeb.Models
         public DbSet<Preposition> Prepositions { get; set; }
         public DbSet<ProfilePreposition> ProfilePrepositions { get; set; }
         public DbSet<Word> Words { get; set; }
+        public DbSet<ProfileWord> ProfileWords { get; set; }
     }
 }

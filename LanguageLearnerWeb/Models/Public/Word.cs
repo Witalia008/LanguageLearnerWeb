@@ -18,7 +18,6 @@ namespace LanguageLearnerWeb.Models
         public virtual Language LanguageFrom { get; set; }
 
         [ForeignKey("LanguageTo")]
-        [Required]
         public int LanguageToId { get; set; }
         public virtual Language LanguageTo { get; set; }
 
