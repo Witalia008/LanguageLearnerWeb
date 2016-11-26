@@ -144,6 +144,7 @@ namespace LanguageLearnerWeb.Migrations.AppContext
             SeedLanguages(context);
             SeedMaterials(context);
             SeedPrepositions(context);
+            SeedWords(context);
 
             SeedProfiles(context);
             SeedProfileLanguages(context);
