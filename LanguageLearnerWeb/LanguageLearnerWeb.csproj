@@ -275,6 +275,7 @@
     <Compile Include="Controllers\ProfileMaterialsController.cs" />
     <Compile Include="Controllers\ProfilePrepositionsController.cs" />
     <Compile Include="Controllers\ProfilesController.cs" />
+    <Compile Include="Controllers\ProfileWordsController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Controllers\WordsController.cs" />
@@ -332,6 +333,10 @@
     <Compile Include="Migrations\AppContext\201611261350509_AddWords.cs" />
     <Compile Include="Migrations\AppContext\201611261350509_AddWords.Designer.cs">
       <DependentUpon>201611261350509_AddWords.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\AppContext\201611261405596_AddProfileWords.cs" />
+    <Compile Include="Migrations\AppContext\201611261405596_AddProfileWords.Designer.cs">
+      <DependentUpon>201611261405596_AddProfileWords.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\AppContext\Configuration.cs" />
     <Compile Include="Models\Personal\Profile.cs" />
@@ -478,6 +483,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\AppContext\201611261350509_AddWords.resx">
       <DependentUpon>201611261350509_AddWords.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\AppContext\201611261405596_AddProfileWords.resx">
+      <DependentUpon>201611261405596_AddProfileWords.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

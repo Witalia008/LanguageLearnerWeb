@@ -138,6 +138,16 @@ namespace LanguageLearnerWeb.Migrations.AppContext
                 new ProfilePreposition { Id = 3, PrepositionId = 2, ProfileId = "hello1@gmail.com" });
         }
 
+        private void SeedProfileWords(ApplicationDbContext context)
+        {
+            context.ProfileWords.AddOrUpdate(
+                w => w.Id,
+                new ProfileWord { Id = 1, ProfileId = "hello1@gmail.com", WordId = 1 },
+                new ProfileWord { Id = 2, ProfileId = "hello2@gmail.com", WordId = 1 },
+                new ProfileWord { Id = 3, ProfileId = "hello1@gmail.com", WordId = 2 },
+                new ProfileWord { Id = 4, ProfileId = "hello2@gmail.com", WordId = 3 });
+        }
+
         protected override void Seed(LanguageLearnerWeb.Models.ApplicationDbContext context)
         {
             SeedLevels(context);
@@ -151,6 +161,7 @@ namespace LanguageLearnerWeb.Migrations.AppContext
             SeedProfileMaterials(context);
             SeedSettings(context);
             SeedProfilePrepositions(context);
+            SeedProfileWords(context);
 
             //  This method will be called after migrating to the latest version.
 
