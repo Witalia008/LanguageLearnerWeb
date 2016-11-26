@@ -102,6 +102,16 @@ namespace LanguageLearnerWeb.Migrations.AppContext
                 new ProfileMaterial { Id = 2, MaterialId = 2, ProfileId = "hello2@gmail.com" });
         }
 
+        private void SeedSettings(ApplicationDbContext context)
+        {
+            context.Settings.AddOrUpdate(
+                s => s.Id,
+                new Settings { Id = 1, ProfileId = "hello1@gmail.com", Key = "1", Value = "1" },
+                new Settings { Id = 1, ProfileId = "hello1@gmail.com", Key = "2", Value = "2" },
+                new Settings { Id = 1, ProfileId = "hello2@gmail.com", Key = "1", Value = "3" },
+                new Settings { Id = 1, ProfileId = "hello1@gmail.com", Key = "2", Value = "4" });
+        }
+
         protected override void Seed(LanguageLearnerWeb.Models.ApplicationDbContext context)
         {
             SeedLevels(context);
@@ -111,6 +121,7 @@ namespace LanguageLearnerWeb.Migrations.AppContext
             SeedProfiles(context);
             SeedProfileLanguages(context);
             SeedProfileMaterials(context);
+            SeedSettings(context);
 
             //  This method will be called after migrating to the latest version.
 

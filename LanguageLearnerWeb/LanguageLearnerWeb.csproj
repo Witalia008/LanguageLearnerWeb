@@ -274,6 +274,7 @@
     <Compile Include="Controllers\ProfileMaterialsController.cs" />
     <Compile Include="Controllers\ProfilesController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
+    <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Extensions\Search\Bing.cs" />
     <Compile Include="Extensions\Search\SearchEngine.cs" />
     <Compile Include="Extensions\Search\Yandex.cs" />
@@ -313,6 +314,10 @@
     <Compile Include="Migrations\AppContext\201611261113066_AddProfileMaterials.Designer.cs">
       <DependentUpon>201611261113066_AddProfileMaterials.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\AppContext\201611261145447_AddSettings.cs" />
+    <Compile Include="Migrations\AppContext\201611261145447_AddSettings.Designer.cs">
+      <DependentUpon>201611261145447_AddSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\AppContext\Configuration.cs" />
     <Compile Include="Models\Personal\Profile.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -321,6 +326,7 @@
     <Compile Include="Models\Personal\ProfileDTO.cs" />
     <Compile Include="Models\Personal\ProfileLanguage.cs" />
     <Compile Include="Models\Personal\ProfileMaterial.cs" />
+    <Compile Include="Models\Personal\Settings.cs" />
     <Compile Include="Models\Public\Language.cs" />
     <Compile Include="Models\Public\Level.cs" />
     <Compile Include="Models\Public\Material.cs" />
@@ -441,6 +447,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\AppContext\201611261113066_AddProfileMaterials.resx">
       <DependentUpon>201611261113066_AddProfileMaterials.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\AppContext\201611261145447_AddSettings.resx">
+      <DependentUpon>201611261145447_AddSettings.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
