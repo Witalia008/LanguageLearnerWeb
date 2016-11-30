@@ -105,7 +105,7 @@ namespace LanguageLearnerWeb.Controllers
         }
 
         // DELETE: api/Profiles/5
-        [ResponseType(typeof(Profile))]
+        [ResponseType(typeof(ProfileDTO))]
         public async Task<IHttpActionResult> DeleteProfile(string id)
         {
             Profile profile = await db.Profiles.FindAsync(id);
@@ -117,7 +117,7 @@ namespace LanguageLearnerWeb.Controllers
             db.Profiles.Remove(profile);
             await db.SaveChangesAsync();
 
-            return Ok(profile);
+            return Ok(AutoMapper.Mapper.Map<ProfileDTO>(profile));
         }
 
         protected override void Dispose(bool disposing)
