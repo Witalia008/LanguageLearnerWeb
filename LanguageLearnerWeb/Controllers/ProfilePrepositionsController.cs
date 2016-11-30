@@ -13,6 +13,7 @@ using LanguageLearnerWeb.Models;
 
 namespace LanguageLearnerWeb.Controllers
 {
+    [Authorize]
     public class ProfilePrepositionsController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();

@@ -13,6 +13,7 @@ using LanguageLearnerWeb.Models;
 
 namespace LanguageLearnerWeb.Controllers
 {
+    [Authorize]
     public class ProfileWordsController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
