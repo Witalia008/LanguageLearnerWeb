@@ -350,6 +350,7 @@
     <Compile Include="Models\Personal\ProfilePreposition.cs" />
     <Compile Include="Models\Personal\ProfileWord.cs" />
     <Compile Include="Models\Personal\Settings.cs" />
+    <Compile Include="Models\Personal\SettingsDTO.cs" />
     <Compile Include="Models\Public\Language.cs" />
     <Compile Include="Models\Public\Level.cs" />
     <Compile Include="Models\Public\Material.cs" />
