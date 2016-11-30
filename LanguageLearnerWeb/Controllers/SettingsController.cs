@@ -56,7 +56,7 @@ namespace LanguageLearnerWeb.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (id != settings.Id && settings.ProfileId != User.Identity.GetUserId())
+            if (id != settings.Id)
             {
                 return BadRequest();
             }
