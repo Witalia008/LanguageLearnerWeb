@@ -35,7 +35,9 @@ namespace LanguageLearnerWeb
                     .ForMember(dest => dest.Rule, opts => opts.MapFrom(opt => opt.Preposition.Rule));
 
                 cfg.CreateMap<ProfilePrepositionDTO, ProfilePreposition>();
+                cfg.CreateMap<ProfileDTO, LanguageLearnerWeb.Models.Profile>();
                 cfg.CreateMap<Settings, SettingsDTO>();
+                cfg.CreateMap<SettingsDTO, Settings>();
             });
         }
     }

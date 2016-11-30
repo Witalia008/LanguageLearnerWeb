@@ -11,6 +11,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using LanguageLearnerWeb.Models;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNet.Identity;
 
 namespace LanguageLearnerWeb.Controllers
 {
@@ -40,19 +41,20 @@ namespace LanguageLearnerWeb.Controllers
 
         // PUT: api/Profiles/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutProfile(string id, Profile profile)
+        public async Task<IHttpActionResult> PutProfile(string id, ProfileDTO profile)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != profile.UserId)
+            if (id != profile.UserId && profile.UserId != User.Identity.GetUserId())
             {
                 return BadRequest();
             }
 
-            db.Entry(profile).State = EntityState.Modified;
+            profile.UserId = User.Identity.GetUserId();
+            db.Entry(AutoMapper.Mapper.Map<Profile>(profile)).State = EntityState.Modified;
 
             try
             {
@@ -75,14 +77,17 @@ namespace LanguageLearnerWeb.Controllers
 
         // POST: api/Profiles
         [ResponseType(typeof(ProfileDTO))]
-        public async Task<IHttpActionResult> PostProfile(Profile profile)
+        public async Task<IHttpActionResult> PostProfile(ProfileDTO profile)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            db.Profiles.Add(profile);
+            var userId = User.Identity.GetUserId();
+            profile.UserId = userId;
+            var prof = AutoMapper.Mapper.Map<Profile>(profile);
+            db.Profiles.Add(prof);
 
             try
             {
@@ -100,8 +105,8 @@ namespace LanguageLearnerWeb.Controllers
                 }
             }
 
-            return CreatedAtRoute("DefaultApi", new { id = profile.UserId }, 
-                AutoMapper.Mapper.Map<ProfileDTO>(profile));
+            return CreatedAtRoute("DefaultApi", new { id = prof.UserId }, 
+                AutoMapper.Mapper.Map<ProfileDTO>(prof));
         }
 
         // DELETE: api/Profiles/5
