@@ -49,19 +49,21 @@ namespace LanguageLearnerWeb.Controllers
 
         // PUT: api/Settings/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutSettings(int id, Settings settings)
+        public async Task<IHttpActionResult> PutSettings(int id, SettingsDTO settings)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != settings.Id || settings.ProfileId != User.Identity.GetUserId())
+            if (id != settings.Id && settings.ProfileId != User.Identity.GetUserId())
             {
                 return BadRequest();
             }
 
-            db.Entry(settings).State = EntityState.Modified;
+            settings.ProfileId = User.Identity.GetUserId();
+
+            db.Entry(AutoMapper.Mapper.Map<Settings>(settings)).State = EntityState.Modified;
 
             try
             {
@@ -84,7 +86,7 @@ namespace LanguageLearnerWeb.Controllers
 
         // POST: api/Settings
         [ResponseType(typeof(SettingsDTO))]
-        public async Task<IHttpActionResult> PostSettings(Settings settings)
+        public async Task<IHttpActionResult> PostSettings(SettingsDTO settings)
         {
             if (!ModelState.IsValid)
             {
@@ -92,11 +94,12 @@ namespace LanguageLearnerWeb.Controllers
             }
 
             settings.ProfileId = User.Identity.GetUserId();
-            db.Settings.Add(settings);
+            var setts = AutoMapper.Mapper.Map<Settings>(settings);
+            db.Settings.Add(setts);
             await db.SaveChangesAsync();
 
-            return CreatedAtRoute("DefaultApi", new { id = settings.Id }, 
-                AutoMapper.Mapper.Map<SettingsDTO>(settings));
+            return CreatedAtRoute("DefaultApi", new { id = setts.Id }, 
+                AutoMapper.Mapper.Map<SettingsDTO>(setts));
         }
 
         // DELETE: api/Settings/5

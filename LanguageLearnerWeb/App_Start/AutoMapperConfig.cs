@@ -15,7 +15,9 @@ namespace LanguageLearnerWeb
             {
                 cfg.CreateMap<LanguageLearnerWeb.Models.Profile, ProfileDTO>()
                     .ForMember(dest => dest.Email, opts => opts.MapFrom(opt => opt.ApplicationUser.Email));
+                cfg.CreateMap<ProfileDTO, LanguageLearnerWeb.Models.Profile>();
                 cfg.CreateMap<Settings, SettingsDTO>();
+                cfg.CreateMap<SettingsDTO, Settings>();
             });
         }
     }
