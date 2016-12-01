@@ -47,13 +47,22 @@ namespace LanguageLearnerWeb.Controllers
             {
                 return BadRequest(ModelState);
             }
-
+            
             if (id != profile.UserId)
             {
                 return BadRequest();
             }
 
-            profile.UserId = User.Identity.GetUserId();
+            var userId = User.Identity.GetUserId();
+            if (string.IsNullOrEmpty(profile.UserId))
+            {
+                profile.UserId = userId;
+            }
+            if (profile.UserId != userId)
+            {
+                return Unauthorized();
+            }
+
             db.Entry(AutoMapper.Mapper.Map<Profile>(profile)).State = EntityState.Modified;
 
             try
@@ -85,7 +94,15 @@ namespace LanguageLearnerWeb.Controllers
             }
 
             var userId = User.Identity.GetUserId();
-            profile.UserId = userId;
+            if (string.IsNullOrEmpty(profile.UserId))
+            {
+                profile.UserId = userId;
+            }
+            if (profile.UserId != userId)
+            {
+                return Unauthorized();
+            }
+
             var prof = AutoMapper.Mapper.Map<Profile>(profile);
             db.Profiles.Add(prof);
 

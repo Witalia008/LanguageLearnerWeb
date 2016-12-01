@@ -61,7 +61,15 @@ namespace LanguageLearnerWeb.Controllers
                 return BadRequest();
             }
 
-            settings.ProfileId = User.Identity.GetUserId();
+            var userId = User.Identity.GetUserId();
+            if (string.IsNullOrEmpty(settings.ProfileId))
+            {
+                settings.ProfileId = userId;
+            }
+            if (settings.ProfileId != userId)
+            {
+                return Unauthorized();
+            }
 
             db.Entry(AutoMapper.Mapper.Map<Settings>(settings)).State = EntityState.Modified;
 
@@ -93,7 +101,16 @@ namespace LanguageLearnerWeb.Controllers
                 return BadRequest(ModelState);
             }
 
-            settings.ProfileId = User.Identity.GetUserId();
+            var userId = User.Identity.GetUserId();
+            if (string.IsNullOrEmpty(settings.ProfileId))
+            {
+                settings.ProfileId = userId;
+            }
+            if (settings.ProfileId != userId)
+            {
+                return Unauthorized();
+            }
+
             var setts = AutoMapper.Mapper.Map<Settings>(settings);
             db.Settings.Add(setts);
             await db.SaveChangesAsync();
