@@ -45,6 +45,7 @@ namespace LanguageLearnerWeb.Controllers
             bool entire = false, bool inTransl = false)
         {
             var userId = User.Identity.GetUserId();
+            infix = infix.ToLower();
             return (from pw in db.ProfileWords
                     where ((entire && pw.Word.Name.ToLower() == infix || !entire && pw.Word.Name.ToLower().Contains(infix))
                             || (inTransl && pw.Word.Translation.ToLower().Contains(infix)))
