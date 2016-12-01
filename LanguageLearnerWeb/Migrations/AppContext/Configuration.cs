@@ -1,6 +1,7 @@
 namespace LanguageLearnerWeb.Migrations.AppContext
 {
     using Microsoft.AspNet.Identity;
+    using Microsoft.AspNet.Identity.EntityFramework;
     using Models;
     using Newtonsoft.Json;
     using System;
@@ -81,72 +82,78 @@ namespace LanguageLearnerWeb.Migrations.AppContext
 
         private void SeedProfiles(ApplicationDbContext context)
         {
-            var passwordHash = new PasswordHasher();
-            string password = passwordHash.HashPassword("password123");
-            string userName = "hello1@gmail.com";
-            context.Users.AddOrUpdate(
-                u => u.UserName,
-                new ApplicationUser { Id = userName, UserName = userName, PasswordHash = password });
+            var userStore = new UserStore<ApplicationUser>(context);
+            var userManager = new UserManager<ApplicationUser>(userStore);
+            for (int i = 0; i < users.Length; ++i)
+            {
+                var user = new ApplicationUser {
+                    Id = users[i], Email = users[i], UserName = users[i], };
 
-            context.Profiles.AddOrUpdate(
-                p => p.UserName,
-                new Profile { UserId = userName, UserName = userName, InterfaceLanguageId = 1 });
+                if (!context.Users.Any(u => u.UserName == user.UserName))
+                {
+                    userManager.Create(user, "password123");
+                } else
+                {
+                    user.Id = context.Users.Find(user.UserName).Id;
+                    userManager.Update(user);
+                }
 
-            password = passwordHash.HashPassword("password123");
-            userName = "hello2@gmail.com";
-            context.Users.AddOrUpdate(
-                u => u.UserName,
-                new ApplicationUser {Id = userName, UserName = userName, PasswordHash = password });
-
-            context.Profiles.AddOrUpdate(
-                p => p.UserName,
-                new Profile { UserId = userName, UserName = userName, InterfaceLanguageId = 1 });
+                context.Profiles.AddOrUpdate(
+                    p => p.UserName,
+                    new Profile { UserId = users[i], UserName = users[i], InterfaceLanguageId = 1 });
+            }
         }
 
         private void SeedProfileLanguages(ApplicationDbContext context)
         {
             context.ProfileLanguages.AddOrUpdate(
                 p => p.Id,
-                new ProfileLanguage { Id = 1, LanguageId = 1, ProfileId = "hello1@gmail.com", LevelId = 10 },
-                new ProfileLanguage { Id = 2, LanguageId = 3, ProfileId = "hello1@gmail.com", LevelId = 10 });
+                new ProfileLanguage { Id = 1, LanguageId = 1, ProfileId = users[0], LevelId = 10 },
+                new ProfileLanguage { Id = 2, LanguageId = 3, ProfileId = users[1], LevelId = 10 });
         }
 
         private void SeedProfileMaterials(ApplicationDbContext context)
         {
             context.ProfileMaterials.AddOrUpdate(
                 m => m.Id,
-                new ProfileMaterial { Id = 1, MaterialId = 1, ProfileId = "hello1@gmail.com" },
-                new ProfileMaterial { Id = 2, MaterialId = 2, ProfileId = "hello2@gmail.com" });
+                new ProfileMaterial { Id = 1, MaterialId = 1, ProfileId = users[0] },
+                new ProfileMaterial { Id = 2, MaterialId = 2, ProfileId = users[1] });
         }
 
         private void SeedSettings(ApplicationDbContext context)
         {
             context.Settings.AddOrUpdate(
                 s => s.Id,
-                new Settings { Id = 1, ProfileId = "hello1@gmail.com", Key = "1", Value = "1" },
-                new Settings { Id = 1, ProfileId = "hello1@gmail.com", Key = "2", Value = "2" },
-                new Settings { Id = 1, ProfileId = "hello2@gmail.com", Key = "1", Value = "3" },
-                new Settings { Id = 1, ProfileId = "hello1@gmail.com", Key = "2", Value = "4" });
+                new Settings { Id = 1, ProfileId = users[0], Key = "1", Value = "1" },
+                new Settings { Id = 1, ProfileId = users[0], Key = "2", Value = "2" },
+                new Settings { Id = 1, ProfileId = users[1], Key = "1", Value = "3" },
+                new Settings { Id = 1, ProfileId = users[1], Key = "2", Value = "4" });
         }
 
         private void SeedProfilePrepositions(ApplicationDbContext context)
         {
             context.ProfilePrepositions.AddOrUpdate(
                 p => p.Id,
-                new ProfilePreposition { Id = 1, PrepositionId = 1, ProfileId = "hello1@gmail.com" },
-                new ProfilePreposition { Id = 2, PrepositionId = 1, ProfileId = "hello2@gmail.com" },
-                new ProfilePreposition { Id = 3, PrepositionId = 2, ProfileId = "hello1@gmail.com" });
+                new ProfilePreposition { Id = 1, PrepositionId = 1, ProfileId = users[0] },
+                new ProfilePreposition { Id = 2, PrepositionId = 1, ProfileId = users[1] },
+                new ProfilePreposition { Id = 3, PrepositionId = 2, ProfileId = users[1] });
         }
 
         private void SeedProfileWords(ApplicationDbContext context)
         {
             context.ProfileWords.AddOrUpdate(
                 w => w.Id,
-                new ProfileWord { Id = 1, ProfileId = "hello1@gmail.com", WordId = 1 },
-                new ProfileWord { Id = 2, ProfileId = "hello2@gmail.com", WordId = 1 },
-                new ProfileWord { Id = 3, ProfileId = "hello1@gmail.com", WordId = 2 },
-                new ProfileWord { Id = 4, ProfileId = "hello2@gmail.com", WordId = 3 });
+                new ProfileWord { Id = 1, ProfileId = users[0], WordId = 1 },
+                new ProfileWord { Id = 2, ProfileId = users[0], WordId = 1 },
+                new ProfileWord { Id = 3, ProfileId = users[0], WordId = 2 },
+                new ProfileWord { Id = 4, ProfileId = users[1], WordId = 3 });
         }
+
+        private string[] users =
+        {
+            "hello1@gmail.com",
+            "hello2@gmail.com"
+        };
 
         protected override void Seed(LanguageLearnerWeb.Models.ApplicationDbContext context)
         {

@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using LanguageLearnerWeb.Models;
+using Microsoft.AspNet.Identity;
+using AutoMapper.QueryableExtensions;
 
 namespace LanguageLearnerWeb.Controllers
 {
@@ -19,16 +21,21 @@ namespace LanguageLearnerWeb.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: api/ProfileMaterials
-        public IQueryable<ProfileMaterial> GetProfileMaterials()
+        public IQueryable<ProfileMaterialDTO> GetProfileMaterials()
         {
-            return db.ProfileMaterials;
+            string userId = User.Identity.GetUserId();
+            return db.ProfileMaterials.Where(pm => pm.ProfileId == userId).ProjectTo<ProfileMaterialDTO>();
         }
 
         // GET: api/ProfileMaterials/5
-        [ResponseType(typeof(ProfileMaterial))]
+        [ResponseType(typeof(ProfileMaterialDTO))]
         public async Task<IHttpActionResult> GetProfileMaterial(int id)
         {
-            ProfileMaterial profileMaterial = await db.ProfileMaterials.FindAsync(id);
+            var userId = User.Identity.GetUserId();
+            ProfileMaterialDTO profileMaterial = AutoMapper.Mapper.Map<ProfileMaterialDTO>(
+                await db.ProfileMaterials
+                    .Where(pm => pm.Id == id && pm.ProfileId == userId)
+                    .FirstOrDefaultAsync());
             if (profileMaterial == null)
             {
                 return NotFound();
@@ -39,7 +46,7 @@ namespace LanguageLearnerWeb.Controllers
 
         // PUT: api/ProfileMaterials/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutProfileMaterial(int id, ProfileMaterial profileMaterial)
+        public async Task<IHttpActionResult> PutProfileMaterial(int id, ProfileMaterialDTO profileMaterial)
         {
             if (!ModelState.IsValid)
             {
@@ -51,7 +58,17 @@ namespace LanguageLearnerWeb.Controllers
                 return BadRequest();
             }
 
-            db.Entry(profileMaterial).State = EntityState.Modified;
+            var userId = User.Identity.GetUserId();
+            if (string.IsNullOrEmpty(profileMaterial.ProfileId))
+            {
+                profileMaterial.ProfileId = userId;
+            }
+            if (profileMaterial.ProfileId != userId)
+            {
+                return Unauthorized();
+            }
+
+            db.Entry(AutoMapper.Mapper.Map<ProfileMaterial>(profileMaterial)).State = EntityState.Modified;
 
             try
             {
@@ -73,25 +90,40 @@ namespace LanguageLearnerWeb.Controllers
         }
 
         // POST: api/ProfileMaterials
-        [ResponseType(typeof(ProfileMaterial))]
-        public async Task<IHttpActionResult> PostProfileMaterial(ProfileMaterial profileMaterial)
+        [ResponseType(typeof(ProfileMaterialDTO))]
+        public async Task<IHttpActionResult> PostProfileMaterial(ProfileMaterialDTO profileMaterial)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            db.ProfileMaterials.Add(profileMaterial);
+            var userId = User.Identity.GetUserId();
+            if (string.IsNullOrEmpty(profileMaterial.ProfileId))
+            {
+                profileMaterial.ProfileId = userId;
+            }
+            if (profileMaterial.ProfileId != userId)
+            {
+                return Unauthorized();
+            }
+
+            var profMat = AutoMapper.Mapper.Map<ProfileMaterial>(profileMaterial);
+            db.ProfileMaterials.Add(profMat);
             await db.SaveChangesAsync();
 
-            return CreatedAtRoute("DefaultApi", new { id = profileMaterial.Id }, profileMaterial);
+            return CreatedAtRoute("DefaultApi", new { id = profMat.Id }, 
+                AutoMapper.Mapper.Map<ProfileMaterialDTO>(profileMaterial));
         }
 
         // DELETE: api/ProfileMaterials/5
-        [ResponseType(typeof(ProfileMaterial))]
+        [ResponseType(typeof(ProfileMaterialDTO))]
         public async Task<IHttpActionResult> DeleteProfileMaterial(int id)
         {
-            ProfileMaterial profileMaterial = await db.ProfileMaterials.FindAsync(id);
+            var userId = User.Identity.GetUserId();
+            ProfileMaterial profileMaterial = await db.ProfileMaterials
+                .Where(pm => pm.Id == id && pm.ProfileId == userId)
+                .FirstOrDefaultAsync(); ;
             if (profileMaterial == null)
             {
                 return NotFound();
@@ -100,7 +132,7 @@ namespace LanguageLearnerWeb.Controllers
             db.ProfileMaterials.Remove(profileMaterial);
             await db.SaveChangesAsync();
 
-            return Ok(profileMaterial);
+            return Ok(AutoMapper.Mapper.Map<ProfileMaterialDTO>(profileMaterial));
         }
 
         protected override void Dispose(bool disposing)

@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using LanguageLearnerWeb.Models;
+using Microsoft.AspNet.Identity;
+using AutoMapper.QueryableExtensions;
 
 namespace LanguageLearnerWeb.Controllers
 {
@@ -18,17 +20,25 @@ namespace LanguageLearnerWeb.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         // GET: api/Settings
-        public IQueryable<Settings> GetSettings()
+        public IQueryable<SettingsDTO> GetSettings()
         {
-            return db.Settings;
+            string userId = User.Identity.GetUserId();
+            logger.Debug("Used ID in GetSettings: " + userId);
+            return db.Settings.Where(b => b.ProfileId == userId).ProjectTo<SettingsDTO>();
         }
 
         // GET: api/Settings/5
-        [ResponseType(typeof(Settings))]
+        [ResponseType(typeof(SettingsDTO))]
         public async Task<IHttpActionResult> GetSettings(int id)
         {
-            Settings settings = await db.Settings.FindAsync(id);
+            var userId = User.Identity.GetUserId();
+            SettingsDTO settings = AutoMapper.Mapper.Map<SettingsDTO>(await db.Settings
+                .Where(s => s.ProfileId == userId && s.Id == id)
+                .FirstOrDefaultAsync());
             if (settings == null)
             {
                 return NotFound();
@@ -37,9 +47,23 @@ namespace LanguageLearnerWeb.Controllers
             return Ok(settings);
         }
 
+        [ResponseType(typeof(SettingsDTO))]
+        public async Task<IHttpActionResult> GetSettings(string key)
+        {
+            var userId = User.Identity.GetUserId();
+            SettingsDTO settings = AutoMapper.Mapper.Map<SettingsDTO>(await db.Settings
+                .Where(s => s.ProfileId == userId && s.Key == key)
+                .FirstOrDefaultAsync());
+            if (settings == null)
+            {
+                return NotFound();
+            }
+            return Ok(settings);
+        }
+
         // PUT: api/Settings/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutSettings(int id, Settings settings)
+        public async Task<IHttpActionResult> PutSettings(int id, SettingsDTO settings)
         {
             if (!ModelState.IsValid)
             {
@@ -51,7 +75,17 @@ namespace LanguageLearnerWeb.Controllers
                 return BadRequest();
             }
 
-            db.Entry(settings).State = EntityState.Modified;
+            var userId = User.Identity.GetUserId();
+            if (string.IsNullOrEmpty(settings.ProfileId))
+            {
+                settings.ProfileId = userId;
+            }
+            if (settings.ProfileId != userId)
+            {
+                return Unauthorized();
+            }
+
+            db.Entry(AutoMapper.Mapper.Map<Settings>(settings)).State = EntityState.Modified;
 
             try
             {
@@ -73,25 +107,40 @@ namespace LanguageLearnerWeb.Controllers
         }
 
         // POST: api/Settings
-        [ResponseType(typeof(Settings))]
-        public async Task<IHttpActionResult> PostSettings(Settings settings)
+        [ResponseType(typeof(SettingsDTO))]
+        public async Task<IHttpActionResult> PostSettings(SettingsDTO settings)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            db.Settings.Add(settings);
+            var userId = User.Identity.GetUserId();
+            if (string.IsNullOrEmpty(settings.ProfileId))
+            {
+                settings.ProfileId = userId;
+            }
+            if (settings.ProfileId != userId)
+            {
+                return Unauthorized();
+            }
+
+            var setts = AutoMapper.Mapper.Map<Settings>(settings);
+            db.Settings.Add(setts);
             await db.SaveChangesAsync();
 
-            return CreatedAtRoute("DefaultApi", new { id = settings.Id }, settings);
+            return CreatedAtRoute("DefaultApi", new { id = setts.Id }, 
+                AutoMapper.Mapper.Map<SettingsDTO>(setts));
         }
 
         // DELETE: api/Settings/5
-        [ResponseType(typeof(Settings))]
+        [ResponseType(typeof(SettingsDTO))]
         public async Task<IHttpActionResult> DeleteSettings(int id)
         {
-            Settings settings = await db.Settings.FindAsync(id);
+            var userId = User.Identity.GetUserId();
+            Settings settings = await db.Settings
+                .Where(e => e.Id == id && e.ProfileId == userId)
+                .FirstOrDefaultAsync();
             if (settings == null)
             {
                 return NotFound();
@@ -100,7 +149,7 @@ namespace LanguageLearnerWeb.Controllers
             db.Settings.Remove(settings);
             await db.SaveChangesAsync();
 
-            return Ok(settings);
+            return Ok(AutoMapper.Mapper.Map<SettingsDTO>(settings));
         }
 
         protected override void Dispose(bool disposing)
@@ -114,7 +163,8 @@ namespace LanguageLearnerWeb.Controllers
 
         private bool SettingsExists(int id)
         {
-            return db.Settings.Count(e => e.Id == id) > 0;
+            var userId = User.Identity.GetUserId();
+            return db.Settings.Count(e => e.Id == id && e.ProfileId == userId) > 0;
         }
     }
 }

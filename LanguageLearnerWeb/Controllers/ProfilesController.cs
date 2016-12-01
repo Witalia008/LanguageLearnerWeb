@@ -11,10 +11,12 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using LanguageLearnerWeb.Models;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNet.Identity;
 
 namespace LanguageLearnerWeb.Controllers
 {
     [Authorize]
+    [RoutePrefix("api/Profiles")]
     public class ProfilesController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -29,6 +31,10 @@ namespace LanguageLearnerWeb.Controllers
         [ResponseType(typeof(ProfileDTO))]
         public async Task<IHttpActionResult> GetProfile(string id)
         {
+            if (id != User.Identity.GetUserId())
+            {
+                return Unauthorized();
+            }
             ProfileDTO profile = AutoMapper.Mapper.Map<ProfileDTO>(await db.Profiles.FindAsync(id));
             if (profile == null)
             {
@@ -38,21 +44,47 @@ namespace LanguageLearnerWeb.Controllers
             return Ok(profile);
         }
 
+        [ResponseType(typeof(Language))]
+        [Route("IntfLanguage")]
+        public async Task<IHttpActionResult> GetProfileLanguage(string id)
+        {
+            if (id != User.Identity.GetUserId())
+            {
+                return Unauthorized();
+            }
+            Profile profile = await db.Profiles.FindAsync(id);
+            if (profile == null || profile.InterfaceLanguage == null)
+            {
+                return NotFound();
+            }
+            return Ok(profile.InterfaceLanguage);
+        }
+
         // PUT: api/Profiles/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutProfile(string id, Profile profile)
+        public async Task<IHttpActionResult> PutProfile(string id, ProfileDTO profile)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
+            
             if (id != profile.UserId)
             {
                 return BadRequest();
             }
 
-            db.Entry(profile).State = EntityState.Modified;
+            var userId = User.Identity.GetUserId();
+            if (string.IsNullOrEmpty(profile.UserId))
+            {
+                profile.UserId = userId;
+            }
+            if (profile.UserId != userId)
+            {
+                return Unauthorized();
+            }
+
+            db.Entry(AutoMapper.Mapper.Map<Profile>(profile)).State = EntityState.Modified;
 
             try
             {
@@ -75,14 +107,25 @@ namespace LanguageLearnerWeb.Controllers
 
         // POST: api/Profiles
         [ResponseType(typeof(ProfileDTO))]
-        public async Task<IHttpActionResult> PostProfile(Profile profile)
+        public async Task<IHttpActionResult> PostProfile(ProfileDTO profile)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            db.Profiles.Add(profile);
+            var userId = User.Identity.GetUserId();
+            if (string.IsNullOrEmpty(profile.UserId))
+            {
+                profile.UserId = userId;
+            }
+            if (profile.UserId != userId)
+            {
+                return Unauthorized();
+            }
+
+            var prof = AutoMapper.Mapper.Map<Profile>(profile);
+            db.Profiles.Add(prof);
 
             try
             {
@@ -100,12 +143,12 @@ namespace LanguageLearnerWeb.Controllers
                 }
             }
 
-            return CreatedAtRoute("DefaultApi", new { id = profile.UserId }, 
-                AutoMapper.Mapper.Map<ProfileDTO>(profile));
+            return CreatedAtRoute("DefaultApi", new { id = prof.UserId }, 
+                AutoMapper.Mapper.Map<ProfileDTO>(prof));
         }
 
         // DELETE: api/Profiles/5
-        [ResponseType(typeof(Profile))]
+        [ResponseType(typeof(ProfileDTO))]
         public async Task<IHttpActionResult> DeleteProfile(string id)
         {
             Profile profile = await db.Profiles.FindAsync(id);
@@ -117,7 +160,7 @@ namespace LanguageLearnerWeb.Controllers
             db.Profiles.Remove(profile);
             await db.SaveChangesAsync();
 
-            return Ok(profile);
+            return Ok(AutoMapper.Mapper.Map<ProfileDTO>(profile));
         }
 
         protected override void Dispose(bool disposing)
