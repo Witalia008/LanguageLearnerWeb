@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using LanguageLearnerWeb.Models;
+using Microsoft.AspNet.Identity;
+using AutoMapper.QueryableExtensions;
 
 namespace LanguageLearnerWeb.Controllers
 {
@@ -19,39 +21,57 @@ namespace LanguageLearnerWeb.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: api/ProfilePrepositions
-        public IQueryable<ProfilePreposition> GetProfilePrepositions()
+        public IQueryable<ProfilePrepositionDTO> GetProfilePrepositions()
         {
-            return db.ProfilePrepositions;
+            var userId = User.Identity.GetUserId();
+            return db.ProfilePrepositions
+                .Where(p => p.ProfileId == userId)
+                .ProjectTo<ProfilePrepositionDTO>();
         }
 
         // GET: api/ProfilePrepositions/5
-        [ResponseType(typeof(ProfilePreposition))]
+        [ResponseType(typeof(ProfilePrepositionDTO))]
         public async Task<IHttpActionResult> GetProfilePreposition(int id)
         {
-            ProfilePreposition profilePreposition = await db.ProfilePrepositions.FindAsync(id);
-            if (profilePreposition == null)
+            var userId = User.Identity.GetUserId();
+            ProfilePrepositionDTO profilePrepositionDTO = 
+                AutoMapper.Mapper.Map<ProfilePrepositionDTO>(await db.ProfilePrepositions
+                .Where(p => p.Id == id && p.ProfileId == userId)
+                .FirstOrDefaultAsync());
+            if (profilePrepositionDTO == null)
             {
                 return NotFound();
             }
 
-            return Ok(profilePreposition);
+            return Ok(profilePrepositionDTO);
         }
 
         // PUT: api/ProfilePrepositions/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutProfilePreposition(int id, ProfilePreposition profilePreposition)
+        public async Task<IHttpActionResult> PutProfilePreposition(int id, ProfilePrepositionDTO profilePrepositionDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != profilePreposition.Id)
+            if (id != profilePrepositionDTO.Id)
             {
                 return BadRequest();
             }
 
-            db.Entry(profilePreposition).State = EntityState.Modified;
+            var userId = User.Identity.GetUserId();
+            if (string.IsNullOrEmpty(profilePrepositionDTO.ProfileId))
+            {
+                profilePrepositionDTO.ProfileId = userId;
+            }
+            if (profilePrepositionDTO.ProfileId != userId)
+            {
+                return Unauthorized();
+            }
+
+            db.Entry(AutoMapper.Mapper.Map<ProfilePreposition>(profilePrepositionDTO)).State = 
+                EntityState.Modified;
 
             try
             {
@@ -73,25 +93,39 @@ namespace LanguageLearnerWeb.Controllers
         }
 
         // POST: api/ProfilePrepositions
-        [ResponseType(typeof(ProfilePreposition))]
-        public async Task<IHttpActionResult> PostProfilePreposition(ProfilePreposition profilePreposition)
+        [ResponseType(typeof(ProfilePrepositionDTO))]
+        public async Task<IHttpActionResult> PostProfilePreposition(ProfilePrepositionDTO profilePrepositionDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            var userId = User.Identity.GetUserId();
+            if (string.IsNullOrEmpty(profilePrepositionDTO.ProfileId))
+            {
+                profilePrepositionDTO.ProfileId = userId;
+            }
+            if (profilePrepositionDTO.ProfileId != userId)
+            {
+                return Unauthorized();
+            }
+
+            var profilePreposition = AutoMapper.Mapper.Map<ProfilePreposition>(profilePrepositionDTO);
             db.ProfilePrepositions.Add(profilePreposition);
             await db.SaveChangesAsync();
 
-            return CreatedAtRoute("DefaultApi", new { id = profilePreposition.Id }, profilePreposition);
+            return CreatedAtRoute("DefaultApi", new { id = profilePreposition.Id }, 
+                AutoMapper.Mapper.Map<ProfilePrepositionDTO>(profilePreposition));
         }
 
         // DELETE: api/ProfilePrepositions/5
-        [ResponseType(typeof(ProfilePreposition))]
+        [ResponseType(typeof(ProfilePrepositionDTO))]
         public async Task<IHttpActionResult> DeleteProfilePreposition(int id)
         {
-            ProfilePreposition profilePreposition = await db.ProfilePrepositions.FindAsync(id);
+            ProfilePreposition profilePreposition = await db.ProfilePrepositions
+                .Where(p => p.Id == id && p.ProfileId == User.Identity.GetUserId())
+                .FirstOrDefaultAsync();
             if (profilePreposition == null)
             {
                 return NotFound();
@@ -100,7 +134,7 @@ namespace LanguageLearnerWeb.Controllers
             db.ProfilePrepositions.Remove(profilePreposition);
             await db.SaveChangesAsync();
 
-            return Ok(profilePreposition);
+            return Ok(AutoMapper.Mapper.Map<ProfilePrepositionDTO>(profilePreposition));
         }
 
         protected override void Dispose(bool disposing)

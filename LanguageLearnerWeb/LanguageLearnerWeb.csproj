@@ -345,6 +345,7 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Personal\ProfileDTO.cs" />
     <Compile Include="Models\Personal\ProfileLanguage.cs" />
+    <Compile Include="Models\Personal\ProfileLanguageDTO.cs" />
     <Compile Include="Models\Personal\ProfileMaterial.cs" />
     <Compile Include="Models\Personal\ProfilePreposition.cs" />
     <Compile Include="Models\Personal\ProfileWord.cs" />
