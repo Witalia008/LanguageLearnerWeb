@@ -1,0 +1,5 @@
+2016-11-30 17:12:20,399 [16] DEBUG LanguageLearnerWeb.Controllers.SettingsController - Used ID in GetSettings: c17c5e13-eae7-4c6d-b73e-afb2fec4ed7e
+2016-11-30 17:14:41,203 [5] DEBUG LanguageLearnerWeb.Controllers.SettingsController - Used ID in GetSettings: c17c5e13-eae7-4c6d-b73e-afb2fec4ed7e
+2016-11-30 18:21:25,673 [49] DEBUG LanguageLearnerWeb.Controllers.SettingsController - Used ID in GetSettings: hello1@gmail.com
+2016-11-30 18:30:17,629 [74] DEBUG LanguageLearnerWeb.Controllers.SettingsController - Used ID in GetSettings: hello1@gmail.com
+2016-11-30 18:43:15,819 [16] DEBUG LanguageLearnerWeb.Controllers.SettingsController - Used ID in GetSettings: hello1@gmail.com
