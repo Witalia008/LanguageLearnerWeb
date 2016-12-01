@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using LanguageLearnerWeb.Models;
+using Microsoft.AspNet.Identity;
+using AutoMapper.QueryableExtensions;
 
 namespace LanguageLearnerWeb.Controllers
 {
@@ -19,16 +21,20 @@ namespace LanguageLearnerWeb.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: api/ProfileWords
-        public IQueryable<ProfileWord> GetProfileWords()
+        public IQueryable<ProfileWordDTO> GetProfileWords()
         {
-            return db.ProfileWords;
+            var userId = User.Identity.GetUserId();
+            return db.ProfileWords.Where(pw => pw.ProfileId == userId).ProjectTo<ProfileWordDTO>();
         }
 
         // GET: api/ProfileWords/5
-        [ResponseType(typeof(ProfileWord))]
+        [ResponseType(typeof(ProfileWordDTO))]
         public async Task<IHttpActionResult> GetProfileWord(int id)
         {
-            ProfileWord profileWord = await db.ProfileWords.FindAsync(id);
+            var userId = User.Identity.GetUserId();
+            ProfileWordDTO profileWord = AutoMapper.Mapper.Map<ProfileWordDTO>(await db.ProfileWords
+                .Where(pw => pw.Id == id && pw.ProfileId == userId)
+                .FirstOrDefaultAsync());
             if (profileWord == null)
             {
                 return NotFound();
@@ -39,7 +45,7 @@ namespace LanguageLearnerWeb.Controllers
 
         // PUT: api/ProfileWords/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutProfileWord(int id, ProfileWord profileWord)
+        public async Task<IHttpActionResult> PutProfileWord(int id, ProfileWordDTO profileWord)
         {
             if (!ModelState.IsValid)
             {
@@ -51,7 +57,17 @@ namespace LanguageLearnerWeb.Controllers
                 return BadRequest();
             }
 
-            db.Entry(profileWord).State = EntityState.Modified;
+            var userId = User.Identity.GetUserId();
+            if (string.IsNullOrEmpty(profileWord.ProfileId))
+            {
+                profileWord.ProfileId = userId;
+            }
+            if (profileWord.ProfileId != userId)
+            {
+                return Unauthorized();
+            }
+
+            db.Entry(AutoMapper.Mapper.Map<ProfileWord>(profileWord)).State = EntityState.Modified;
 
             try
             {
@@ -73,25 +89,40 @@ namespace LanguageLearnerWeb.Controllers
         }
 
         // POST: api/ProfileWords
-        [ResponseType(typeof(ProfileWord))]
-        public async Task<IHttpActionResult> PostProfileWord(ProfileWord profileWord)
+        [ResponseType(typeof(ProfileWordDTO))]
+        public async Task<IHttpActionResult> PostProfileWord(ProfileWordDTO profileWord)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            db.ProfileWords.Add(profileWord);
+            var userId = User.Identity.GetUserId();
+            if (string.IsNullOrEmpty(profileWord.ProfileId))
+            {
+                profileWord.ProfileId = userId;
+            }
+            if (profileWord.ProfileId != userId)
+            {
+                return Unauthorized();
+            }
+
+            var profWord = AutoMapper.Mapper.Map<ProfileWord>(profileWord);
+            db.ProfileWords.Add(profWord);
             await db.SaveChangesAsync();
 
-            return CreatedAtRoute("DefaultApi", new { id = profileWord.Id }, profileWord);
+            return CreatedAtRoute("DefaultApi", new { id = profWord.Id }, 
+                AutoMapper.Mapper.Map<ProfileWordDTO>(profWord));
         }
 
         // DELETE: api/ProfileWords/5
-        [ResponseType(typeof(ProfileWord))]
+        [ResponseType(typeof(ProfileWordDTO))]
         public async Task<IHttpActionResult> DeleteProfileWord(int id)
         {
-            ProfileWord profileWord = await db.ProfileWords.FindAsync(id);
+            var userId = User.Identity.GetUserId();
+            ProfileWord profileWord = await db.ProfileWords
+                .Where(pw => pw.Id == id && pw.ProfileId == userId)
+                .FirstOrDefaultAsync();
             if (profileWord == null)
             {
                 return NotFound();
@@ -100,7 +131,7 @@ namespace LanguageLearnerWeb.Controllers
             db.ProfileWords.Remove(profileWord);
             await db.SaveChangesAsync();
 
-            return Ok(profileWord);
+            return Ok(AutoMapper.Mapper.Map<ProfileWordDTO>(profileWord));
         }
 
         protected override void Dispose(bool disposing)

@@ -347,8 +347,10 @@
     <Compile Include="Models\Personal\ProfileLanguage.cs" />
     <Compile Include="Models\Personal\ProfileLanguageDTO.cs" />
     <Compile Include="Models\Personal\ProfileMaterial.cs" />
+    <Compile Include="Models\Personal\ProfileMaterialDTO.cs" />
     <Compile Include="Models\Personal\ProfilePreposition.cs" />
     <Compile Include="Models\Personal\ProfileWord.cs" />
+    <Compile Include="Models\Personal\ProfileWordDTO.cs" />
     <Compile Include="Models\Personal\Settings.cs" />
     <Compile Include="Models\Personal\SettingsDTO.cs" />
     <Compile Include="Models\Public\Language.cs" />
