@@ -16,6 +16,7 @@ using AutoMapper.QueryableExtensions;
 namespace LanguageLearnerWeb.Controllers
 {
     [Authorize]
+    [RoutePrefix("api/ProfileWords")]
     public class ProfileWordsController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -25,6 +26,71 @@ namespace LanguageLearnerWeb.Controllers
         {
             var userId = User.Identity.GetUserId();
             return db.ProfileWords.Where(pw => pw.ProfileId == userId).ProjectTo<ProfileWordDTO>();
+        }
+
+        [Route("ByLangs")]
+        public IQueryable<ProfileWordDTO> GetProfileWordsByLangs(int langFromId, int langToId)
+        {
+            var userId = User.Identity.GetUserId();
+            return db.ProfileWords.Where(pw => pw.ProfileId == userId
+                && pw.Word.LanguageFromId == langFromId
+                && pw.Word.LanguageToId == langToId)
+                .ProjectTo<ProfileWordDTO>();
+        }
+
+        [Route("ByInfix")]
+        public IQueryable<ProfileWordDTO> GetProfileWordsByInfix(
+            int langFromId, int langToId,
+            string infix, string tags = "",
+            bool entire = false, bool inTransl = false)
+        {
+            var userId = User.Identity.GetUserId();
+            return (from pw in db.ProfileWords
+                    where ((entire && pw.Word.Name.ToLower() == infix || !entire && pw.Word.Name.ToLower().Contains(infix))
+                            || (inTransl && pw.Word.Translation.ToLower().Contains(infix)))
+                        && pw.Word.LanguageFromId == langFromId
+                        && pw.Word.LanguageToId == langToId
+                        && (pw.Tags == null || pw.Tags == "" || pw.Tags.Contains(tags))
+                        && pw.ProfileId == userId
+                    select pw)
+                .ProjectTo<ProfileWordDTO>();
+        }
+
+        [Route("Random")]
+        public IQueryable<ProfileWordDTO> GetProfileWordsRandomNoI(
+            int langFromId, int langToId,
+            int limit, string tags = "")
+        {
+            var userId = User.Identity.GetUserId();
+            return (from pw in db.ProfileWords
+                    where pw.ProfileId == userId
+                         && pw.Word.LanguageFromId == langFromId
+                         && pw.Word.LanguageToId == langToId
+                    orderby Guid.NewGuid()
+                    select pw).Take(limit).ProjectTo<ProfileWordDTO>();
+        }
+
+        [Route("RandTransl")]
+        public IQueryable<ProfileWordDTO> GetProfileWordsAndTranslations(
+            int limit, int langId, string tags = "")
+        {
+            var userId = User.Identity.GetUserId();
+            return (from pw in db.ProfileWords
+                    where pw.ProfileId == userId
+                        && (pw.Word.LanguageFromId == langId || pw.Word.LanguageToId == langId)
+                    orderby Guid.NewGuid()
+                    select pw).Take(limit).ProjectTo<ProfileWordDTO>();
+        }
+
+        [Route("OnLearn")]
+        [ResponseType(typeof(int))]
+        public async Task<IHttpActionResult> GetProfileWordsOnLearn(int langFromId, int langToId, string tags)
+        {
+            var userId = User.Identity.GetUserId();
+            int count = await db.ProfileWords.CountAsync(pw => pw.ProfileId == userId
+                && pw.Word.LanguageFromId == langFromId
+                && pw.Word.LanguageToId == langToId);
+            return Ok(count);
         }
 
         // GET: api/ProfileWords/5
