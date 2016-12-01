@@ -47,6 +47,20 @@ namespace LanguageLearnerWeb.Controllers
             return Ok(settings);
         }
 
+        [ResponseType(typeof(SettingsDTO))]
+        public async Task<IHttpActionResult> GetSettings(string key)
+        {
+            var userId = User.Identity.GetUserId();
+            SettingsDTO settings = AutoMapper.Mapper.Map<SettingsDTO>(await db.Settings
+                .Where(s => s.ProfileId == userId && s.Key == key)
+                .FirstOrDefaultAsync());
+            if (settings == null)
+            {
+                return NotFound();
+            }
+            return Ok(settings);
+        }
+
         // PUT: api/Settings/5
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> PutSettings(int id, SettingsDTO settings)
