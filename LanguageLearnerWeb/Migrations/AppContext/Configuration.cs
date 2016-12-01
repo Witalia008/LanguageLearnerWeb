@@ -80,6 +80,12 @@ namespace LanguageLearnerWeb.Migrations.AppContext
                 new Word { Id = 3, Name = "q", Translation = "w", LanguageFromId = 3, LanguageToId = 1 });
         }
 
+        private void SeedRoles(ApplicationDbContext context)
+        {
+            new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context))
+                .Create(new IdentityRole("Admin"));
+        }
+
         private void SeedProfiles(ApplicationDbContext context)
         {
             var userStore = new UserStore<ApplicationUser>(context);
@@ -92,6 +98,7 @@ namespace LanguageLearnerWeb.Migrations.AppContext
                 if (!context.Users.Any(u => u.UserName == user.UserName))
                 {
                     userManager.Create(user, "password123");
+                    userManager.AddToRole(user.Id, "Admin");
                 } else
                 {
                     user.Id = context.Users.Find(user.UserName).Id;
@@ -163,7 +170,9 @@ namespace LanguageLearnerWeb.Migrations.AppContext
             SeedPrepositions(context);
             SeedWords(context);
 
+            SeedRoles(context);
             SeedProfiles(context);
+
             SeedProfileLanguages(context);
             SeedProfileMaterials(context);
             SeedSettings(context);
