@@ -16,6 +16,7 @@ using Microsoft.AspNet.Identity;
 namespace LanguageLearnerWeb.Controllers
 {
     [Authorize]
+    [RoutePrefix("api/Profiles")]
     public class ProfilesController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -30,6 +31,10 @@ namespace LanguageLearnerWeb.Controllers
         [ResponseType(typeof(ProfileDTO))]
         public async Task<IHttpActionResult> GetProfile(string id)
         {
+            if (id != User.Identity.GetUserId())
+            {
+                return Unauthorized();
+            }
             ProfileDTO profile = AutoMapper.Mapper.Map<ProfileDTO>(await db.Profiles.FindAsync(id));
             if (profile == null)
             {
@@ -37,6 +42,22 @@ namespace LanguageLearnerWeb.Controllers
             }
 
             return Ok(profile);
+        }
+
+        [ResponseType(typeof(Language))]
+        [Route("IntfLanguage")]
+        public async Task<IHttpActionResult> GetProfileLanguage(string id)
+        {
+            if (id != User.Identity.GetUserId())
+            {
+                return Unauthorized();
+            }
+            Profile profile = await db.Profiles.FindAsync(id);
+            if (profile == null || profile.InterfaceLanguage == null)
+            {
+                return NotFound();
+            }
+            return Ok(profile.InterfaceLanguage);
         }
 
         // PUT: api/Profiles/5
