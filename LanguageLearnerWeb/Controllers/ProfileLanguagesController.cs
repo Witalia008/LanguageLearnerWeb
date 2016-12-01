@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using LanguageLearnerWeb.Models;
+using AutoMapper.QueryableExtensions;
+using Microsoft.AspNet.Identity;
 
 namespace LanguageLearnerWeb.Controllers
 {
@@ -19,38 +21,55 @@ namespace LanguageLearnerWeb.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: api/ProfileLanguages
-        public IQueryable<ProfileLanguage> GetProfileLanguages()
+        public IQueryable<ProfileLanguageDTO> GetProfileLanguages()
         {
-            return db.ProfileLanguages;
+            string userId = User.Identity.GetUserId();
+            return db.ProfileLanguages.Where(p => p.ProfileId == userId)
+                .ProjectTo<ProfileLanguageDTO>();
         }
 
         // GET: api/ProfileLanguages/5
-        [ResponseType(typeof(ProfileLanguage))]
+        [ResponseType(typeof(ProfileLanguageDTO))]
         public async Task<IHttpActionResult> GetProfileLanguage(int id)
         {
-            ProfileLanguage profileLanguage = await db.ProfileLanguages.FindAsync(id);
-            if (profileLanguage == null)
+            string userId = User.Identity.GetUserId();
+            ProfileLanguageDTO profileLanguageDTO =
+                AutoMapper.Mapper.Map<ProfileLanguageDTO>(await db.ProfileLanguages
+                .Where(p => p.Id == id && p.ProfileId == userId)
+                .FirstOrDefaultAsync());
+            if (profileLanguageDTO == null)
             {
                 return NotFound();
             }
 
-            return Ok(profileLanguage);
+            return Ok(profileLanguageDTO);
         }
 
         // PUT: api/ProfileLanguages/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutProfileLanguage(int id, ProfileLanguage profileLanguage)
+        public async Task<IHttpActionResult> PutProfileLanguage(int id, ProfileLanguageDTO profileLanguageDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != profileLanguage.Id)
+            if (id != profileLanguageDTO.Id)
             {
                 return BadRequest();
             }
 
+            var userId = User.Identity.GetUserId();
+            if (string.IsNullOrEmpty(profileLanguageDTO.ProfileId))
+            {
+                profileLanguageDTO.ProfileId = userId;
+            }
+            if (profileLanguageDTO.ProfileId != userId)
+            {
+                return Unauthorized();
+            }
+
+            var profileLanguage = AutoMapper.Mapper.Map<ProfileLanguage>(profileLanguageDTO);
             db.Entry(profileLanguage).State = EntityState.Modified;
 
             try
@@ -73,25 +92,39 @@ namespace LanguageLearnerWeb.Controllers
         }
 
         // POST: api/ProfileLanguages
-        [ResponseType(typeof(ProfileLanguage))]
-        public async Task<IHttpActionResult> PostProfileLanguage(ProfileLanguage profileLanguage)
+        [ResponseType(typeof(ProfileLanguageDTO))]
+        public async Task<IHttpActionResult> PostProfileLanguage(ProfileLanguageDTO profileLanguageDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            var userId = User.Identity.GetUserId();
+            if (string.IsNullOrEmpty(profileLanguageDTO.ProfileId))
+            {
+                profileLanguageDTO.ProfileId = userId;
+            }
+            if (profileLanguageDTO.ProfileId != userId)
+            {
+                return Unauthorized();
+            }
+
+            var profileLanguage = AutoMapper.Mapper.Map<ProfileLanguage>(profileLanguageDTO);
             db.ProfileLanguages.Add(profileLanguage);
             await db.SaveChangesAsync();
 
-            return CreatedAtRoute("DefaultApi", new { id = profileLanguage.Id }, profileLanguage);
+            return CreatedAtRoute("DefaultApi", new { id = profileLanguage.Id }, 
+                AutoMapper.Mapper.Map<ProfileLanguageDTO>(profileLanguage));
         }
 
         // DELETE: api/ProfileLanguages/5
-        [ResponseType(typeof(ProfileLanguage))]
+        [ResponseType(typeof(ProfileLanguageDTO))]
         public async Task<IHttpActionResult> DeleteProfileLanguage(int id)
         {
-            ProfileLanguage profileLanguage = await db.ProfileLanguages.FindAsync(id);
+            ProfileLanguage profileLanguage = await db.ProfileLanguages
+                .Where(p => p.Id == id && p.ProfileId == User.Identity.GetUserId())
+                .FirstOrDefaultAsync();
             if (profileLanguage == null)
             {
                 return NotFound();
@@ -100,7 +133,7 @@ namespace LanguageLearnerWeb.Controllers
             db.ProfileLanguages.Remove(profileLanguage);
             await db.SaveChangesAsync();
 
-            return Ok(profileLanguage);
+            return Ok(AutoMapper.Mapper.Map<ProfileLanguageDTO>(profileLanguage));
         }
 
         protected override void Dispose(bool disposing)
