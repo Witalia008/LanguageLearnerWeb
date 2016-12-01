@@ -22,6 +22,7 @@ namespace LanguageLearnerWeb.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: api/ProfileMaterials
+        [Route("", Name = "GetProfileMaterials")]
         public IQueryable<ProfileMaterialDTO> GetProfileMaterials()
         {
             string userId = User.Identity.GetUserId();
@@ -60,6 +61,7 @@ namespace LanguageLearnerWeb.Controllers
         }
 
         // GET: api/ProfileMaterials/5
+        [Route("{id}", Name = "GetProfileMaterialById")]
         [ResponseType(typeof(ProfileMaterialDTO))]
         public async Task<IHttpActionResult> GetProfileMaterial(int id)
         {
@@ -121,7 +123,8 @@ namespace LanguageLearnerWeb.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        // POST: api/ProfileMaterials
+        // POST: api/ProfileMaterials/Single
+        [Route("Single")]
         [ResponseType(typeof(ProfileMaterialDTO))]
         public async Task<IHttpActionResult> PostProfileMaterial(ProfileMaterialDTO profileMaterial)
         {
@@ -143,15 +146,16 @@ namespace LanguageLearnerWeb.Controllers
             var profMat = AutoMapper.Mapper.Map<ProfileMaterial>(profileMaterial);
             db.ProfileMaterials.Add(profMat);
             await db.SaveChangesAsync();
+            profMat.Material = await db.Materials.FindAsync(profMat.MaterialId);
 
-            return CreatedAtRoute("DefaultApi", new { id = profMat.Id }, 
-                AutoMapper.Mapper.Map<ProfileMaterialDTO>(profileMaterial));
+            return CreatedAtRoute("GetProfileMaterialById", new { id = profMat.Id }, 
+                AutoMapper.Mapper.Map<ProfileMaterialDTO>(profMat));
         }
 
         // POST
         [Route("Range")]
         [ResponseType(typeof(List<ProfileMaterialDTO>))]
-        public async Task<IHttpActionResult> PostProfilePaterials(List<ProfileMaterialDTO> profileMaterials)
+        public async Task<IHttpActionResult> PostProfileMaterialsRange(List<ProfileMaterialDTO> profileMaterials)
         {
             if (!ModelState.IsValid)
             {
@@ -180,8 +184,11 @@ namespace LanguageLearnerWeb.Controllers
             db.ProfileMaterials.AddRange(materials);
             await db.SaveChangesAsync();
 
-            return CreatedAtRoute("DefaultApi", new { id = materials[0].Id },
+            materials[0].Material = await db.Materials.FindAsync(materials[0].MaterialId);
+
+            return CreatedAtRoute("GetProfileMaterialById", new { id = materials[0].Id },
                 AutoMapper.Mapper.Map<ProfileMaterialDTO>(materials[0]));
+            //return RedirectToRoute("GetProfileMaterials", null);
         }
 
         // DELETE: api/ProfileMaterials/5
