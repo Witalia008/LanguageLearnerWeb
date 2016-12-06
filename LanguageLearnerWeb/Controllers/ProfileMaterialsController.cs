@@ -16,18 +16,52 @@ using AutoMapper.QueryableExtensions;
 namespace LanguageLearnerWeb.Controllers
 {
     [Authorize]
+    [RoutePrefix("api/ProfileMaterials")]
     public class ProfileMaterialsController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: api/ProfileMaterials
+        [Route("", Name = "GetProfileMaterials")]
         public IQueryable<ProfileMaterialDTO> GetProfileMaterials()
         {
             string userId = User.Identity.GetUserId();
             return db.ProfileMaterials.Where(pm => pm.ProfileId == userId).ProjectTo<ProfileMaterialDTO>();
         }
 
+        [Route("Random")]
+        public IQueryable<ProfileMaterialDTO> GetProfileMaterialsRandom(
+            int langId, int limit,
+            bool learntOnly = false, string tags = "")
+        { 
+            var userId = User.Identity.GetUserId();
+            return (from pm in db.ProfileMaterials
+                    where pm.ProfileId == userId
+                        && pm.Material.LanguageId == langId
+                        && (pm.IsLearnt || !learntOnly)
+                    orderby Guid.NewGuid()
+                    select pm).Take(limit).ProjectTo<ProfileMaterialDTO>();           
+        }
+
+        [Route("ByQuery")]
+        public IQueryable<ProfileMaterialDTO> GetProfileMaterialsByQueryString(
+            int langId, string infix, int limit,
+            int start = 0, bool hideLearnt = true, string tags = "")
+        {
+            var userId = User.Identity.GetUserId();
+            infix = infix.ToLower();
+            return (from pm in db.ProfileMaterials
+                    where pm.ProfileId == userId
+                        && pm.Material.LanguageId == langId
+                        && (!pm.IsLearnt || !hideLearnt)
+                        && (pm.Material.Headline.ToLower().Contains(infix)
+                            || pm.Material.ShortDescr.ToLower().Contains(infix))
+                    orderby pm.Material.Rating descending
+                    select pm).Skip(start).Take(limit).ProjectTo<ProfileMaterialDTO>();
+        }
+
         // GET: api/ProfileMaterials/5
+        [Route("{id}", Name = "GetProfileMaterialById")]
         [ResponseType(typeof(ProfileMaterialDTO))]
         public async Task<IHttpActionResult> GetProfileMaterial(int id)
         {
@@ -89,7 +123,8 @@ namespace LanguageLearnerWeb.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        // POST: api/ProfileMaterials
+        // POST: api/ProfileMaterials/Single
+        [Route("Single")]
         [ResponseType(typeof(ProfileMaterialDTO))]
         public async Task<IHttpActionResult> PostProfileMaterial(ProfileMaterialDTO profileMaterial)
         {
@@ -111,9 +146,49 @@ namespace LanguageLearnerWeb.Controllers
             var profMat = AutoMapper.Mapper.Map<ProfileMaterial>(profileMaterial);
             db.ProfileMaterials.Add(profMat);
             await db.SaveChangesAsync();
+            profMat.Material = await db.Materials.FindAsync(profMat.MaterialId);
 
-            return CreatedAtRoute("DefaultApi", new { id = profMat.Id }, 
-                AutoMapper.Mapper.Map<ProfileMaterialDTO>(profileMaterial));
+            return CreatedAtRoute("GetProfileMaterialById", new { id = profMat.Id }, 
+                AutoMapper.Mapper.Map<ProfileMaterialDTO>(profMat));
+        }
+
+        // POST
+        [Route("Range")]
+        [ResponseType(typeof(List<ProfileMaterialDTO>))]
+        public async Task<IHttpActionResult> PostProfileMaterialsRange(List<ProfileMaterialDTO> profileMaterials)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (profileMaterials.Count == 0)
+            {
+                return BadRequest();
+            }
+
+            var userId = User.Identity.GetUserId();
+            List<ProfileMaterial> materials = new List<ProfileMaterial>();
+            foreach (var pm in profileMaterials)
+            {
+                if (string.IsNullOrEmpty(pm.ProfileId))
+                {
+                    pm.ProfileId = userId;
+                }
+                if (pm.ProfileId != userId)
+                {
+                    return Unauthorized();
+                }
+                materials.Add(AutoMapper.Mapper.Map<ProfileMaterial>(pm));
+            }
+            
+            db.ProfileMaterials.AddRange(materials);
+            await db.SaveChangesAsync();
+
+            materials[0].Material = await db.Materials.FindAsync(materials[0].MaterialId);
+
+            return CreatedAtRoute("GetProfileMaterialById", new { id = materials[0].Id },
+                AutoMapper.Mapper.Map<ProfileMaterialDTO>(materials[0]));
+            //return RedirectToRoute("GetProfileMaterials", null);
         }
 
         // DELETE: api/ProfileMaterials/5
