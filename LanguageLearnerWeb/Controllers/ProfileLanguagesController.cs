@@ -16,6 +16,7 @@ using Microsoft.AspNet.Identity;
 namespace LanguageLearnerWeb.Controllers
 {
     [Authorize]
+    [RoutePrefix("api/ProfileLanguages")]
     public class ProfileLanguagesController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -30,6 +31,7 @@ namespace LanguageLearnerWeb.Controllers
 
         // GET: api/ProfileLanguages/5
         [ResponseType(typeof(ProfileLanguageDTO))]
+        [Route("{id}", Name = "GetProfileLanguageById")]
         public async Task<IHttpActionResult> GetProfileLanguage(int id)
         {
             string userId = User.Identity.GetUserId();
@@ -43,6 +45,33 @@ namespace LanguageLearnerWeb.Controllers
             }
 
             return Ok(profileLanguageDTO);
+        }
+
+        // GET: api/ProfileLanguages/Active
+        [ResponseType(typeof(ProfileLanguageDTO))]
+        [Route("Active")]
+        public async Task<IHttpActionResult> GetActive()
+        {
+            var userId = User.Identity.GetUserId();
+            ProfileLanguageDTO profileLanguageDTO =
+                AutoMapper.Mapper.Map<ProfileLanguageDTO>(await db.ProfileLanguages
+                .Where(p => p.ProfileId == userId && p.IsActive == true)
+                .FirstOrDefaultAsync());
+
+            if (profileLanguageDTO == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(profileLanguageDTO);
+        }
+
+        // GET: api/ProfileLanguages?onLearn=true
+        public IQueryable<ProfileLanguageDTO> GetByOnLearn(bool isOnLearn)
+        {
+            return db.ProfileLanguages
+                .Where(p => p.ProfileId == User.Identity.GetUserId() && p.IsOnLearn == isOnLearn)
+                .ProjectTo<ProfileLanguageDTO>();
         }
 
         // PUT: api/ProfileLanguages/5
@@ -91,6 +120,22 @@ namespace LanguageLearnerWeb.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
+        // PUT: api/ProfileLanguages/ResetDailyProgress
+        [ResponseType(typeof(void))]
+        [Route("ResetDailyProgress")]
+        public async Task<IHttpActionResult> ResetDailyProgress()
+        {
+            var userId = User.Identity.GetUserId();
+            db.ProfileLanguages
+                .Where(p => p.ProfileId == userId)
+                .ToList()
+                .ForEach(p => p.DailyProgress = 0);
+
+            await db.SaveChangesAsync();
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
         // POST: api/ProfileLanguages
         [ResponseType(typeof(ProfileLanguageDTO))]
         public async Task<IHttpActionResult> PostProfileLanguage(ProfileLanguageDTO profileLanguageDTO)
@@ -114,8 +159,42 @@ namespace LanguageLearnerWeb.Controllers
             db.ProfileLanguages.Add(profileLanguage);
             await db.SaveChangesAsync();
 
-            return CreatedAtRoute("DefaultApi", new { id = profileLanguage.Id }, 
+            return CreatedAtRoute("GetProfileLanguageById", new { id = profileLanguage.Id }, 
                 AutoMapper.Mapper.Map<ProfileLanguageDTO>(profileLanguage));
+        }
+
+        // POST: api/ProfileLanguages/Range
+        [Route("Range")]
+        [ResponseType(typeof(List<ProfileLanguageDTO>))]
+        public async Task<IHttpActionResult> PostProfileLanguages(List<ProfileLanguageDTO> profileLanguageDTOs)
+        {
+            if (!ModelState.IsValid || profileLanguageDTOs.Count() == 0)
+            {
+                return BadRequest();
+            }
+
+            var userId = User.Identity.GetUserId();
+            List<ProfileLanguage> profileLanguages = new List<ProfileLanguage>();
+            foreach (var pl in profileLanguageDTOs)
+            {
+                if (string.IsNullOrEmpty(pl.ProfileId))
+                {
+                    pl.ProfileId = userId;
+                }
+                if (userId != pl.ProfileId)
+                {
+                    return Unauthorized();
+                }
+                profileLanguages.Add(AutoMapper.Mapper.Map<ProfileLanguage>(pl));
+            }
+
+            db.ProfileLanguages.AddRange(profileLanguages);
+            await db.SaveChangesAsync();
+            
+            profileLanguages[0] = await db.ProfileLanguages.FindAsync(profileLanguages[0].Id);
+
+            return CreatedAtRoute("GetProfileLanguageById", new { id = profileLanguages[0].Id },
+                AutoMapper.Mapper.Map<ProfileLanguageDTO>(profileLanguages[0]));
         }
 
         // DELETE: api/ProfileLanguages/5
