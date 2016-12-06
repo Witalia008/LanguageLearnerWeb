@@ -16,6 +16,7 @@ using AutoMapper.QueryableExtensions;
 namespace LanguageLearnerWeb.Controllers
 {
     [Authorize]
+    [RoutePrefix("api/ProfilePrepositions")]
     public class ProfilePrepositionsController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -31,6 +32,7 @@ namespace LanguageLearnerWeb.Controllers
 
         // GET: api/ProfilePrepositions/5
         [ResponseType(typeof(ProfilePrepositionDTO))]
+        [Route("{id}", Name = "GetProfilePrepositionByName")]
         public async Task<IHttpActionResult> GetProfilePreposition(int id)
         {
             var userId = User.Identity.GetUserId();
@@ -44,6 +46,18 @@ namespace LanguageLearnerWeb.Controllers
             }
 
             return Ok(profilePrepositionDTO);
+        }
+
+        // GET: api/ProfilePrepositions/Random
+        [Route("Random")]
+        public IQueryable<ProfilePrepositionDTO> GetProfilePrepositionsRandom(int langId, int limit)
+        {
+            var userId = User.Identity.GetUserId();
+            return (from pp in db.ProfilePrepositions
+                    where pp.ProfileId == userId
+                        && pp.Preposition.LanguageId == langId
+                    orderby (Guid.NewGuid())
+                    select pp).Take(limit).ProjectTo<ProfilePrepositionDTO>();
         }
 
         // PUT: api/ProfilePrepositions/5
@@ -115,8 +129,46 @@ namespace LanguageLearnerWeb.Controllers
             db.ProfilePrepositions.Add(profilePreposition);
             await db.SaveChangesAsync();
 
-            return CreatedAtRoute("DefaultApi", new { id = profilePreposition.Id }, 
+            return CreatedAtRoute("GetProfilePrepositionByName", new { id = profilePreposition.Id }, 
                 AutoMapper.Mapper.Map<ProfilePrepositionDTO>(profilePreposition));
+        }
+
+        // POST: api/ProfilePrepositions/Range
+        [ResponseType(typeof(List<ProfilePrepositionDTO>))]
+        [Route("Range")]
+        public async Task<IHttpActionResult> PostProfilePrepositions(List<ProfilePrepositionDTO> profilePrepositionDTOs)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (profilePrepositionDTOs.Count == 0)
+            {
+                return BadRequest();
+            }
+
+            List<ProfilePreposition> profilePrepositions = new List<ProfilePreposition>();
+            var userId = User.Identity.GetUserId();
+            foreach (var pp in profilePrepositionDTOs)
+            {
+                if (string.IsNullOrEmpty(pp.ProfileId))
+                {
+                    pp.ProfileId = userId;
+                }
+                if (pp.ProfileId != userId)
+                {
+                    return Unauthorized();
+                }
+                profilePrepositions.Add(AutoMapper.Mapper.Map<ProfilePreposition>(pp));
+            }
+
+            db.ProfilePrepositions.AddRange(profilePrepositions);
+            await db.SaveChangesAsync();
+
+            profilePrepositions[0] = await db.ProfilePrepositions.FindAsync(profilePrepositions[0].Id);
+
+            return CreatedAtRoute("GetProfilePrepositionByName", new { id = profilePrepositions[0].Id },
+                AutoMapper.Mapper.Map<ProfilePrepositionDTO>(profilePrepositions[0]));
         }
 
         // DELETE: api/ProfilePrepositions/5
