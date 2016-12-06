@@ -10,7 +10,7 @@ namespace LanguageLearnerWeb.Models
         public int Id { get; set; }
 
         public int LanguageId { get; set; }
-        public int Source { get; set; }
+        public string Source { get; set; }
         public string Name { get; set; }
         public string NameOriginal { get; set; } 
         public string ShortName { get; set; }

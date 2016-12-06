@@ -10,9 +10,11 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using LanguageLearnerWeb.Models;
+using System.Text.RegularExpressions;
 
 namespace LanguageLearnerWeb.Controllers
 {
+    [RoutePrefix("api/Languages")]
     public class LanguagesController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -28,6 +30,41 @@ namespace LanguageLearnerWeb.Controllers
         public async Task<IHttpActionResult> GetLanguage(int id)
         {
             Language language = await db.Languages.FindAsync(id);
+            if (language == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(language);
+        }
+
+        // GET: api/Languages?name=name
+        public IQueryable<Language> GetByName(string name)
+        {
+            return db.Languages.Where(l => l.Name == name);
+        }
+
+        // GET: api/Languages?shortName=XX
+        public IQueryable<Language> GetByShort(string shortName)
+        {
+            return db.Languages.Where(l => l.ShortName == shortName);
+        }
+
+        // GET: api/Languages?shortCC=XX-XX
+        [ResponseType(typeof(Language))]
+        public async Task<IHttpActionResult> GetByShortCC(string shortCC)
+        {
+            Regex r = new Regex(@"^[A-Z]{2}-[A-Z]{2}$");
+
+            if (!r.Match(shortCC).Success)
+            {
+                return BadRequest();
+            }
+
+            Language language = await db.Languages
+                .Where(l => l.ShortNameCC == shortCC)
+                .FirstOrDefaultAsync();
+
             if (language == null)
             {
                 return NotFound();
